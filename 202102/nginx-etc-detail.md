@@ -87,6 +87,17 @@ http {
 
 最后，建议设置一个 Nginx 的 HTTPS 服务器并将所有 HTTP 请求重定向到 HTTPS，这是另外的话题了。
 
+**Appendix**
+
+修改 Nginx 配置后需要用到的命令行：
+
+```shell
+# 测试配置
+nginx- t
+# 重新加载
+nginx -s reload
+```
+
 **Reference**
 
 Nginx 官方文档. http://nginx.org/en/docs/.
