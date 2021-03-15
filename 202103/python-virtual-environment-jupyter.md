@@ -2,7 +2,7 @@
 
 # Python virtual environment with Jupyter Notebook
 
-## 2021 年 3 月151 日
+## 2021 年 3 月15 日
 
 ## Mar 15 2021
 
