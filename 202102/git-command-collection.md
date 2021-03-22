@@ -14,7 +14,7 @@
 git clone https://github.com/<path>.git
 ```
 
-附上一个[Chrome 拓展](https://chrome.google.com/webstore/detail/gitzip-for-github/ffabmkklhbepgcgfonabamgnfafbdlkn?hl=en)，可以指定 Github 的单个文件夹下载，对于克隆一些大型项目的部分文件非常有用。
+附上一个[Chrome 拓展](https://chrome.google.com/webstore/detail/gitzip-for-github/ffabmkklhbepgcgfonabamgnfafbdlkn?hl=en)，可以指定 Github 的单个文件夹下载，可以用于克隆一些大型项目的部分文件。
 
 **查看仓库绑定关系**
 
@@ -46,7 +46,7 @@ git remote add upstream https://github.com/<path>.git
 **从源仓库取文件到本地、合并**
 
 ```shell
-git fetch upstream
+git fetch upstream main
 git checkout main
 git merge upstream/main
 ```
@@ -75,3 +75,5 @@ git log
 git show <id>
 git reset <id>
 ```
+
+在使用`git log`查看回滚日志时，若想退出，需按 q 键。

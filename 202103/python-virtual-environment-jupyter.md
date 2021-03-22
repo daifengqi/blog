@@ -40,5 +40,19 @@ pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1  | xargs -n
 
 You'd better do this in the virtual environment, since in your root environment it may exist many useless packages that you don't want to upgrade (time-consuming if you do!).
 
+### Appendix: manage your python verison on Macbook via 'pyenv'
 
+An example for installing and using python3.7.3 as your mac python default version.
+
+```shell
+brew install pyenv
+pyenv install 3.7.3
+# if above row gives error, try next
+pyenv install --patch 3.7.3 < <(curl -sSL https://github.com/python/cpython/commit/8ea6353.patch)
+# set the global version
+pyenv global 3.7.3
+eval "$(pyenv init -)"
+# check
+pyenv version
+```
 
