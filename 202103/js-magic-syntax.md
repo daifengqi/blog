@@ -2,9 +2,9 @@
 
 # JavaScript: one-row-zen
 
-## 2021 年 2 月 28 日
+## 2021 年 3月 27 日
 
-## Feb 28 2021
+## Mar 27 2021
 
 ---
 
@@ -44,3 +44,35 @@ function preSum(arr) {
   return arr.map((v, i) => arr.slice(0, i + 1).reduce((a, b) => a + b));
 }
 ```
+
+**二维数组压平到一维**
+
+```js
+const arr = [[1,2], [3,4], [5,6]];
+arr.reduce((acc, cur) => acc.concat(cur), [])
+```
+
+- 这里涉及到`Array.prototype.reduce()`的妙用，通过提供一个初始空列表来实现不断的列表连接。
+
+**数组去重**
+
+```js
+const arr = [1,2,2,3,3,3,3,3,4,5,6,6,7];
+arr.reduce((acc, cur) => acc.includes(cur) ? acc : [...acc, cur], [])
+```
+
+- 同上，结合`reduce`和展开（spread）运算符`...`的用法。
+
+**数组扁平化+去重+升序排列**
+
+```js
+const arr = [ [1, 2, 2], [3, 4, 5, 5], [6, 7, 8, 9, [11, 12, [12, 13, [14] ] ] ], 10];
+Array.from(new Set(arr.flat(Infinity))).sort((a,b) => a - b)
+```
+
+**判断两个数组是否完全相等**
+
+```js
+arr1.length === arr2.length && arr1.every((val, idx) => val === arr2[idx])
+```
+
