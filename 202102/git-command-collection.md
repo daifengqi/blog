@@ -77,8 +77,8 @@ git remote add upstream https://github.com/<path>.git
 **本地删除绑定仓库**
 
 ```shell
-git remote add origin https://github.com/<path>.git
-git remote add upstream https://github.com/<path>.git
+git remote remove origin https://github.com/<path>.git
+git remote remove upstream https://github.com/<path>.git
 ```
 
 与上面的操作相反，这里在词法上也仅仅是把`add`修改为了`remove`
