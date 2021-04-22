@@ -43,6 +43,14 @@ git clone https://github.com/<path>.git
 
 对于使用npm的用户，也可以通过[degit](https://github.com/Rich-Harris/degit)快速克隆部分文件。
 
+**查看仓库状态**
+
+```shell
+git status
+```
+
+显示工作目录和临时区域的状态，查看到哪些更改已经提交，哪些文件没有被跟踪。
+
 **查看仓库绑定关系**
 
 ```shell
@@ -50,6 +58,8 @@ git remote -v
 ```
 
 一般说来有两种，origin 表示直接绑定的仓库，一般指向自己的仓库；upstream 表示 fork 的源仓库。这两个单词可以看作一种标志。
+
+以上两个命令可用来快速判断当前路径是否是一个git仓库。
 
 **添加、修改与提交**
 
@@ -64,6 +74,14 @@ git push origin main
 第一行的点`.`表示匹配所有文件，如果只是要提交修改单个文件，比如某文件叫`test.py`，那么只需要把指令修改为`git add test.py`。
 
 "commit message"是一种留言，用于简短地说明本次做了什么修改，作为记录。
+
+**撤销上次提交**
+
+```shell
+git reset HEAD~
+```
+
+这是一个比较复杂的问题，关于撤销提交的讨论请参考这个[stackoverflow](https://stackoverflow.com/questions/927358/how-do-i-undo-the-most-recent-local-commits-in-git)。
 
 **本地绑定远程的仓库和上游仓库**
 
