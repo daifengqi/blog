@@ -73,7 +73,7 @@ git push origin main
 
 第一行的点`.`表示匹配所有文件，如果只是要提交修改单个文件，比如某文件叫`test.py`，那么只需要把指令修改为`git add test.py`。
 
-"commit message"是一种留言，用于简短地说明本次做了什么修改，作为记录。
+`"commit message"`是一种留言，用于简短地说明本次做了什么修改，作为记录。
 
 **撤销上次提交**
 
@@ -110,6 +110,8 @@ git merge upstream/main
 ```
 
 这个操作会去取 upstream 仓库的最新内容，然后合并到本地仓库。
+
+如果`merge`时出现`conflict error`，可以先修改出现冲突的文件，然后`git add filename`，之后`commit`，就可以解决冲突。
 
 **从远处仓库取文件到本地**
 
