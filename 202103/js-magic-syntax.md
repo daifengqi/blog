@@ -78,3 +78,15 @@ Array.from(new Set(arr.flat(Infinity))).sort((a,b) => a - b)
 arr1.length === arr2.length && arr1.every((val, idx) => val === arr2[idx])
 ```
 
+### 对数组的每个元素赋值
+
+```javascript
+dp.forEach((v, i) => dp[i] = [nums[i]]);
+```
+
+### 从二维数组返回长度最大的一个数组
+
+```javascript
+dp.reduce((a,b) => a.length > b.length ? a : b);
+```
+
