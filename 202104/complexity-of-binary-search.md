@@ -58,6 +58,8 @@ if (nums[left] == target) {
 
 这个写法虽然繁琐，但是胜在不出错，适用性强，对于新手来说，这是一种推荐的写法。这种写法在解决一些较复杂问题时也很好用，推荐一个leetcode例题[【在排序数组中查找元素的第一个和最后一个位置】](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/solution/javascript-bi-mian-si-xun-huan-de-er-fen-hp7a/)，通过做题和看题解可以加深理解。
 
+[点击查看另一个题解：【在D天内送达包裹的能力】](https://leetcode-cn.com/problems/capacity-to-ship-packages-within-d-days/solution/javascript-er-fen-sou-suo-geng-hao-de-yo-9xoc/)
+
 ### 利用辅助指针记录位置
 
 当目标值`target`不存在于`nums`数组中，且`nums`无重复元素时，二分搜索还有一个技巧是，利用一个`pos`指针记录位置，模板如下：

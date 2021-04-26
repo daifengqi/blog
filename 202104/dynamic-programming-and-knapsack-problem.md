@@ -1,4 +1,4 @@
-# 关于动态规划的一些文字
+# 算法之算法：关于动态规划的一些文字
 
 # Some Words About Dynamic Programming
 
