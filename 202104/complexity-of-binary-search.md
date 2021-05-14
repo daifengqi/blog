@@ -88,7 +88,7 @@ while (left <= right) {
 
 ### 避免无法进入循环的错误
 
-有时候二分搜索会因为无法进入`while`循环而出错，这通常是因为循环条件的写法。要避免错误，只有写法是
+注意，在左右都用闭区间的情况下，有时候二分搜索会因为无法进入`while`循环而出错，这通常是因为循环条件的写法。要避免错误，只有写法是
 
 ```c++
 while (left <= right)
@@ -105,3 +105,33 @@ while (left <= right)
 其他练习：
 
 1. [和至少为K的最短子数组](https://leetcode-cn.com/problems/shortest-subarray-with-sum-at-least-k/)
+2. [平方数之和](https://leetcode-cn.com/problems/sum-of-square-numbers/solution/javascript-zhuan-huan-wei-liang-shu-zhi-4firq/)
+
+### 一个`right_bound`的实现
+
+```javascript
+function right_bound(nums, target) {
+  if (nums.length == 0) {
+    return -1;
+  }
+
+  let left = 0;
+  let right = nums.length; // 注意，右边界用的开区间
+
+  while (left < right) {
+    let mid = left + ((right - left) >> 1);
+    if (nums[mid] >= target) {
+      right = mid;
+    } else {
+      left = mid + 1;
+    }
+  }
+  return left; // right和left是相等的
+}
+```
+
+### 隐藏在复杂问题中的二分查找
+
+- [【完成所有工作的最短时间】](https://leetcode-cn.com/problems/find-minimum-time-to-finish-all-jobs/)
+- [【制作m束花所需的最少天数】](https://leetcode-cn.com/problems/minimum-number-of-days-to-make-m-bouquets/)
+

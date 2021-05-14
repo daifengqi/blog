@@ -60,7 +60,9 @@ dp[0] = 1;
 1. 组合问题
 
    ```javascript
-   dp[i] += dp[i-num]
+   if (i >= num) {
+     dp[i] += dp[i-num]
+   }
    ```
 
 2. True、False问题
@@ -72,8 +74,10 @@ dp[0] = 1;
 3. 最大最小问题
 
    ```javascript
-   dp[i] = min(dp[i], dp[i-num]+1)
-   dp[i] = max(dp[i], dp[i-num]+1)
+   if (i >= num) {
+     dp[i] = min(dp[i], dp[i-num]+1)
+   	dp[i] = max(dp[i], dp[i-num]+1)
+   }
    ```
 
 背包问题是动态规划极经典的问题之一，其问题类型数量之庞大，覆盖面之广。
