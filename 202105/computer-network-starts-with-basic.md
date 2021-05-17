@@ -384,14 +384,16 @@ Cache-Control: must-revalidate
 
 ### 综合题：页面性能
 
+先随便打一些：
+
 - 使用CDN
 - 使用懒加载`const xxx =()=>import('./components/...')`
 - 减少监听器个数，使用事件委托
 - 使用资源压缩
 - 非核心资源的异步按需加载
-- 加载过程使用suspense提高用户体验
+- 加载过程使用suspense提升用户体验
 
-
+看完[这篇文章](https://mp.weixin.qq.com/s/CSrzs5oBzHQKuVM3rCjkOQ)之后重新整理这一小节。
 
 ### 综合题：输入URL到页面显示的全过程
 

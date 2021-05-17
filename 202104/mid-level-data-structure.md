@@ -35,14 +35,16 @@ while(stk.length > 0 && heights[stk.top()] >= heights[i]) {
 
 单调队列既具有栈的性质，也具有队列的性质，所以它必须是一个双端队列。
 
-1. `deque`内仅包含窗口内的元素 ⇒ 每轮窗口滑动移除了元素 `nums[i - 1]`，需将 `deque`内的对应元素一起删除。
-2. `deque` 内的元素非严格递减 ⇒ 每轮窗口滑动添加了元素 `nums[j + 1]`，需将`deque`内所有 `< nums[j + 1]`的元素删除，因为要维护最大值。
+1. `deque`内仅包含窗口内的元素 ⇒ 每轮窗口滑动移除了元素 `nums[i - k]`，需将 `deque`内的对应元素一起删除，这里利用了队列的性质；
+2. `deque` 内的元素非严格递减 ⇒ 每轮窗口滑动添加了元素 `nums[j + 1]`，需将`deque`内所有 `< nums[j + 1]`的元素删除，因为要维护最大值，这里利用了栈的性质；
 
 ```javascript
 // 单调队列：已知窗口长度k，当碰到（之前添加过的）该元素时，从队列首部取出
+// 队列性质
 if (deque[0] === nums[i-k]) {
   deque.shift();
 }
+// 栈性质
 while (deque.length > 0 && deque.last() < nums[i]) {
   deque.pop();
 }
@@ -55,6 +57,8 @@ while (deque.length > 0 && deque.last() < nums[i]) {
 ### 优先队列
 
 在<u>ECMAScript</u>标准中并不具备优先队列的实现，这里贴一个手动实现的最小堆，它用数组表示一个二叉树，树的左子节点索引为`2i+1`，右子节点索引为`2i+2`，所以通过子节点得到父节点索引的方式为`(i-1 >> 1)`。
+
+优先队列是一种性质，二叉堆是优先队列的实现。
 
 ```javascript
 // 最小堆
@@ -124,6 +128,58 @@ class MinHeap {
 }
 ```
 
+### 字典树（前缀树）
+
+> Trie（发音类似 "try"）或者说**前缀树**是一种树形数据结构，用于高效地存储和检索字符串数据集中的键。这一数据结构有相当多的应用情景，例如自动补完和拼写检查。
+>
+> ——[力扣208题：实现Trie（前缀树）](https://leetcode-cn.com/problems/implement-trie-prefix-tree/)
+
+一个字典树应该有如下一个内部结构，和三种方法（`insert`，`search`，`startsWith`）：
+
+```javascript
+var Trie = function() {
+    this.children = {};
+};
+
+Trie.prototype.insert = function(word) {
+    let node = this.children;
+    for (const ch of word) {
+        if (!node[ch]) {
+            node[ch] = {};
+        }
+        node = node[ch];
+    }
+    node.isEnd = true;
+};
+
+Trie.prototype.searchPrefix = function(prefix) {
+    let node = this.children;
+    for (const ch of prefix) {
+        if (!node[ch]) {
+            return false;
+        }
+        node = node[ch];
+    }
+    return node;
+}
+
+Trie.prototype.search = function(word) {
+    const node = this.searchPrefix(word);
+    return node !== undefined && node.isEnd !== undefined;
+};
+
+Trie.prototype.startsWith = function(prefix) {
+    return this.searchPrefix(prefix);
+};
+```
+
+字典树的根本思想是一棵有根树，树的每个节点包含以下字段：
+
+- 指向子节点的指针数组`children`，对于本题而言，数组长度为26，即小写英文字母的数量。`children[0]`指向`a`，`children[25]`指向`z`；
+- 布尔字段`isEnd`，表示该节点是否为字符串的结尾；
+
+
+
 ### 特殊结构
 
 其他数据结构，比如[最小栈](https://leetcode-cn.com/problems/min-stack/)，也属于一种“中级”的数据结构，它们通常基于某种基础结构，然后加入了某些特定的方法，包装成一个新类。新方法往往有时间复杂度的限制。
@@ -136,3 +192,4 @@ class MinHeap {
 ### 简单结构的经典题
 
 一道哈希表的例题：[【最长连续序列】](https://leetcode-cn.com/problems/longest-consecutive-sequence/)，这道题如果不知道要使用hash表来做，往往容易被误导，若是知道了就相对简单。
+
