@@ -141,6 +141,16 @@ new String('foo') instanceof Object; // true
 Object.prototype.toString.call()
 ```
 
+这个方法在一种情况下是不可靠的，即对象的`Symbol.toStringTag`属性被污染时，
+
+```javascript
+const myDate = new Date();
+Object.prototype.toString.call(myDate);     // [object Date]
+
+myDate[Symbol.toStringTag] = 'myDate';
+Object.prototype.toString.call(myDate);     // [object myDate]
+```
+
 我们来看看`jquery`源码中如何进行类型判断：
 
 ```js
@@ -216,17 +226,19 @@ var data = {
 
 会被序列成：
 
+> ```
 > ../../v8/src/runtime/[http://runtime-literals.cc](https://link.zhihu.com/?target=http%3A//runtime-literals.cc) 72 constant_properties:
 > 0xdf9ed2aed19: [FixedArray]
 > – length: 6
 > [0]: 0x1b5ec69833d1 <String[4]: name>
 > [1]: 0xdf9ed2aec51 <String[3]: yin>
 > [2]: 0xdf9ed2aec71 <String[3]: age>
->
+> 
 > \[3]: 18
->
+> 
 > [4]: 0xdf9ed2aec91 <String[8]: -school->
 > [5]: 0xdf9ed2aecb1 <String[11]: high school>
+> ```
 
 它是一个FixedArray，一共有6个元素，由于data总共是有3个属性，每个属性有一个key和一个value，所以Array就有6个。第一个元素是第一个key，第二个元素是第一个value，第三个元素是第二个key，第四个元素是第二个key，依次类推。Object提供了一个Print()的函数，把它用来打印对象的信息非常有帮助。上面的输出有两种类型的数据，一种是String类型，第二种是整型类型的。
 
@@ -363,29 +375,6 @@ Array.prototype.__proto__ === Object.prototype // true
 
 ```javascript
 Function.prototype.__proto__ === Object.prototype // true
-```
-
-### 手动实现一个instanceof
-
-`left instanceof right`作用是判断一个实例`left`是否由指定的构造函数`right`创建。
-
-因此，只需要在`left`的原型链上查找，是否能追溯到`right`的原型即可，道理很简单。
-
-```javascript
-function instanceOf(left, right) {
-  const rightPrototype = right.prototype; // 取右表达式的 prototype 值
-  let leftProto = left.__proto__; // 取左表达式的__proto__值
-  while (true) {
-    if (leftProto === null) {
-      return false;
-    }
-    if (leftProto === rightPrototype) {
-      return true;
-    }
-    leftProto = leftProto.__proto__;
-  }
-}
-
 ```
 
 ### JavaScript实现继承的几种方式
@@ -574,146 +563,6 @@ function WelcomeDialog() {
 ### ES6：类和继承的实现原理
 
 [见这篇](https://cloud.tencent.com/developer/article/1500264)。
-
-
-
-### 手动实现一个new
-
-> new 运算符创建一个用户定义的对象类型的实例或具有构造函数的内置对象类型之一。
->
-> ——MDN
-
-我们随便试验一下就知道，`new`运算符创造的实例可以做两件事：
-
-- 访问到构造函数里的属性
-- 访问到构造函数.prototype 中的属性
-
-具体地，`new`操作符会执行如下流程：
-
-1. 用new Object() 的方式新建了一个对象 obj；
-2. 取出第一个参数，就是我们要传入的构造函数；
-3. （🌟）将 obj 的原型指向构造函数，这样 obj 就可以访问到构造函数原型中的属性；
-4. （🌟）使用 apply，改变构造函数 this 的指向到新建的对象，这样 obj 就可以访问到构造函数中的属性；
-5. 返回 obj
-
-因为`new`是一个关键字，使用时要用到一个构造函数加上构造函数的参数，我们无法创建一个关键字，故模拟一个函数如下，
-
-```javascript
-// 不允许es6方法
-function newES5() {
-  // 创建一个新对象
-  var obj = new Object(),
-  // 取出函数的第一个参数，即构造函数
-  var Constructor = [].shift.call(arguments);
-  // 修改原型指向
-  obj.__proto__ = Constructor.prototype;
-  // 给定this指向obj的情况下，执行构造函数
-  var ret = Constructor.apply(obj, arguments);
-  // 处理构造函数有返回值的特殊情况，如果返回值是原始类型，则无视构造函数的返回值，直接返回obj
-  // 否则返回ret
-  return typeof ret === 'object' ? ret : obj;
-}
-```
-
-在ES6以后，通过扩展运算符，Object的新方法，有更简洁的方法，
-
-```javascript
-// 允许es6方法
-function newES6(Fn, ...args) {
-    // 1. 创建一个继承构造函数.prototype的空对象
-    const obj = Object.create(Fn.prototype);
-    // 2. 让空对象作为函数 A 的上下文，并调用 A
-    const ret = Fn.call(obj, ...args);
-    // 3. 如果构造函数返回一个对象，那么直接 return 它，否则返回内部创建的新对象
-    return ret instanceof Object ? ret : obj;
-}
-```
-
-实际上，ES6提供了不使用new来调用构造函数的方法：`Reflect.construct`，详情见[这篇文章](https://cloud.tencent.com/developer/article/1526901)。
-
-### 手动实现call和apply
-
-> call() 方法在使用一个指定的 this 值和若干个指定的参数值的前提下调用某个函数或方法。
->
-> ——MDN
-
-`call()`方法是`Function.prototype`，即函数原型里的方法，必须是一个函数才能调用，它为函数的运行提供了上下文，即`this`指向。
-
-脑洞一开，我们模拟一个`call`方法的步骤可以分为：
-
-1. 将函数设为对象的属性
-2. 执行该函数
-3. 删除该函数
-
-代码如下，
-
-```javascript
-Function.prototype.callES3 = function (context) {
-  if (this === Function.prototype) {
-    return undefined; // 用于防止 Function.prototype.myCall() 直接调用
-  }
-  // call方法允许传入null作为上下文，在浏览器环境下会自动转换为window
-  var context = context || window;
-  context.fn = this;
-  // 获取执行函数的参数
-  var args = [];
-  for (var i = 1, len = arguments.length; i < len; i++) {
-    args.push("arguments[" + i + "]");
-  }
-  // 获取执行结果
-  var result = eval("context.fn(" + args + ")");
-  // 删除上下文里的函数
-  delete context.fn;
-  return result;
-};
-
-```
-
-`apply`方法与`call`几乎一致，只是执行函数的参数单通过一个数组传递进入，而不是像`call`一样不定长传参，这里就不再写了。
-
-一个ES6的写法，
-
-```javascript
-Function.prototype.callES6 = function (context = window, ...args) {
-    if (this === Function.prototype) {
-      return undefined; // 用于防止 Function.prototype.myCall() 直接调用
-    }
-    const fn = Symbol();
-    context[fn] = this;
-    const result = context[fn](...args);
-    delete context[fn];
-    return result;
-  };
-};
-
-```
-
-这里进行了一个优化，赋值`fn = Symbol()`，这样可以避免重名。
-
-### 手动实现bind
-
-> `bind()` 方法创建一个新的函数，在 `bind()` 被调用时，这个新函数的 `this` 被指定为 `bind()` 的第一个参数，而其余参数将作为新函数的参数，供调用时使用。
->
-> ——MDN
-
-实现如下，
-
-```javascript
-Function.prototype.bindES6 = function (context, ...args1) {
-  if (this === Function.prototype) {
-    throw new TypeError("Error");
-  }
-  const _this = this;
-  return function F(...args2) {
-    // 判断是否用于构造函数
-    if (this instanceof F) {
-      return new _this(...args1, ...args2);
-    }
-    return _this.apply(context, args1.concat(args2));
-  };
-};
-
-```
 
 ### 作用域
 
@@ -1041,6 +890,13 @@ export命令用于规定模块的对外接口，import命令用于输入其他�
 
 **JavaScript在浏览器环境下和Node环境下对宏任务、微任务的执行机制是类似的，都是对宏任务进行事件循环，在每次宏任务间隔循环执行所有的微任务，也就是上面的步骤1到4。**
 
+> macrotask 和 microtask 这两个概念，表示**异步任务的两种分类**。在挂起任务时，JS引擎会将所有任务按照类别分到这两个队列中，首先在 macrotask 的队列（这个队列也被叫做 task queue）中取出第一个任务，执行完毕后取出 microtask 队列中的所有任务顺序执行；之后再取 macrotask 任务，周而复始，直至两个队列的任务都取完。
+>
+> 两个类别的具体分类如下：
+>
+> - **macro-task:** script（整体代码）, `setTimeout`, `setInterval`, `setImmediate`, I/O, UI rendering
+> - **micro-task:** `process.nextTick`, `Promises`（这里指浏览器实现的原生 Promise）, `Object.observe`, `MutationObserver`
+
 ### Node的事件循环
 
 ![nodejsloop](https://cescdf.com/image/nodejseventloop.png)
@@ -1212,7 +1068,7 @@ function clone(target) {
 
 没什么好说的。
 
-**深拷贝：乞丐版**
+**深拷贝：低级版**
 
 ```javascript
 JSON.parse(JSON.stringify());
@@ -1263,8 +1119,7 @@ function clone(target, map = new WeakMap()) {
 
 这还不是全部，还要继续处理克隆其他类型，比如Map，Set甚至Function的情况，还可以用不同的遍历方式提高效率，完整版见[《如何写出一个惊艳面试官的深拷贝》](http://www.conardli.top/blog/article/JS%E8%BF%9B%E9%98%B6/%E5%A6%82%E4%BD%95%E5%86%99%E5%87%BA%E4%B8%80%E4%B8%AA%E6%83%8A%E8%89%B3%E9%9D%A2%E8%AF%95%E5%AE%98%E7%9A%84%E6%B7%B1%E6%8B%B7%E8%B4%9D.html#%E5%85%8B%E9%9A%86%E5%87%BD%E6%95%B0)。
 
-
-
 ### 小结
 
-这篇文章已经超过1w字了，故不继续在这里更新，如果有后续会继续开一篇博客。
+注意，所有关于**手动实现JavaScript某一个函数或者功能**的内容已全部转移到新的博客，详情见博客主页。
+
