@@ -119,11 +119,39 @@ for (let i=n-2; i>=0; --i) {
 
 ### 经典双串：LCS
 
-
+略。
 
 练习题：
 
 - [编辑距离](https://leetcode-cn.com/problems/edit-distance/)
 - [Distinct Subsequences](https://leetcode-cn.com/problems/distinct-subsequences/)
 - [交错字符串](https://leetcode-cn.com/problems/interleaving-string/)
+
+### 区间DP例题
+
+通过[【奇怪的打印机】](https://leetcode-cn.com/problems/strange-printer/)一题学会区间DP的正确遍历方式，
+
+```javascript
+var strangePrinter = function(s) {
+    const n = s.length;
+    const f = new Array(n).fill(0).map(() => new Array(n).fill(100));
+	
+  	// 1. 左端点倒序
+    for (let i = n - 1; i >= 0; --i) {
+        f[i][i] = 1;
+      	// 2. 右端点从左向右增加
+        for (let j = i + 1; j < n; ++j) {
+            if (s[i] === s[j]) {
+               f[i][j] = f[i][j - 1];
+            } else {
+              	// 3. 遍历中间值
+                for (let k = i; k < j; ++k) {
+                    f[i][j] = Math.min(f[i][j], f[i][k] + f[k + 1][j]);
+                }
+            }
+        }
+    }
+    return f[0][n-1];
+};
+```
 

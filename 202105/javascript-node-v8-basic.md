@@ -850,6 +850,23 @@ myModule.foo() // foo() other data
 
 **CommonJS**
 
+以CommonJS为例，在编译的过程中，Node对获取的JavaScript文件内容进行了头尾包装。在头部添加了`(function (exports, require, module, __filename, __dirname) {\n`，在尾部添加了`\n});`。
+
+举个例子，一个JavaScript文件会被包装成如下的样子：
+
+```javascript
+(function (exports, require, module, __filename, __dirname) {
+  var math = require('math');
+  exports.area = function (r) {
+    return Math.PI * r * r;
+  }
+})
+```
+
+这样每个模块文件之间都进行了作用域隔离。
+
+> 以上片段出自《深入浅出NodeJS》。
+
 特点：
 
 1. 所有代码都运行在模块作用域，不会污染全局作用域。

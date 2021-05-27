@@ -954,3 +954,10 @@ function App() {
 window.app = schedule();
 ```
 
+>  我们用尽可能少的代码模拟了`Hooks`的运行，但是相比`React Hooks`，他还有很多不足。以下是他与`React Hooks`的区别：
+>
+> 1. `React Hooks`没有使用`isMount`变量，而是在不同时机使用不同的`dispatcher`。换言之，`mount`时的`useState`与`update`时的`useState`不是同一个函数。
+> 2. `React Hooks`有中途跳过`更新`的优化手段。
+> 3. `React Hooks`有`batchedUpdates`，当在`click`中触发三次`updateNum`，`精简React`会触发三次更新，而`React`只会触发一次。
+> 4. `React Hooks`的`update`有`优先级`概念，可以跳过不高优先的`update`。
+
