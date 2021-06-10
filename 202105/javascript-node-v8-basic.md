@@ -41,6 +41,10 @@
 - 对于原始类型，比较时会直接比较它们的值，如果值相等，即返回`true`。
 - 对于引用类型，比较时会比较它们的引用地址，虽然两个变量在堆中存储的对象具有的属性值都是相等的，但是它们被存储在了不同的存储空间，因此比较值为`false`。
 
+**valueOf和toString**
+
+这里有一篇[博客](http://www.adequatelygood.com/Object-to-Primitive-Conversions-in-JavaScript.html)名为“Object-to-Primitive-Conversions-in-JavaScript”，写得很好，可以加深对JavaScript数据类型的理解。
+
 ### 深入理解JavaScript数据类型
 
 在`ECMAScript`关于类型的定义中，只给出了`Object`类型，实际上，我们平时使用的很多引用类型的变量，并不是由`Object`构造的，但是它们原型链的终点都是`Object`，这些类型都属于引用类型。
@@ -792,8 +796,24 @@ myModule.foo() // foo() other data
   // 提供接口
   window.myModule = { foo, bar }; //ES6写法
 })(window);
-
 ```
+
+其实也可以通过赋值，
+
+```javascript
+myModule = (function() {
+  var o = {};
+  
+  // ...
+  
+  o.foo = foo;
+  o.data = data;
+  
+  return o;
+})
+```
+
+来获取这个模块，
 
 ```html
 // index.html文件

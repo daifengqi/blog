@@ -65,18 +65,18 @@ document.querySelector('#app').innerHTML = `
 
 ### Webpack
 
-Webpack没有很好的中文文档，甚至没有合格的英文文档...
+> Webpack没有很好的中文文档，甚至没有合格的英文文档...官方的解释是，webpack是一个静态打包工具。相比于`gulp`等前端流程自动化（基于任务处理）工具，webpack更强调模块化。
 
-我们这一节的目标是用webpack模拟以上功能，首先
+我们这一节的目标是用webpack模拟Vite的功能。
 
-要开始使用Webpack需要，先安装其核心包，
+webpack依赖于node环境，要开始使用Webpack需要，先安装其核心包，
 
 ```shell
 npm init -y
 npm install webpack webpack-cli --save-dev
 ```
 
-要生成打包后的html文件，需要以下插件
+要生成打包后的html文件，需要以下<u>插件</u>，注意，插件是webpack的一个概念，用于用户动态添加新功能，
 
 ```shell
 npm install -D webpack-dev-server html-webpack-plugin
@@ -104,7 +104,7 @@ module.exports = {
   output: {
     // 出口文件和路径
     filename: "bundle.js",
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "dist"), // 动态获取路径
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -122,8 +122,8 @@ module.exports = {
 
 有几点：
 
-- entry文件是webpack项目的入口，这里是`src/index.js`，这个文件必须自己创建；
-- output是打包后的文件和路径，这里指定为`dist/bundle.js`，这个文件由webpack打包后生成，不必自己创建；
+- **entry**文件是webpack项目的入口，这里是`src/index.js`，这个文件必须自己创建；
+- **output**是打包后的文件和路径，这里指定为`dist/bundle.js`，这个文件由webpack打包后生成，不必自己创建；
 - plugins是webpack插件，这里用到的`html-webpack-plugin`使得html文件作为打包出口；
 - devServer带来了热更新，文件压缩等webpack的重要功能，稍后会详细介绍。
 
@@ -168,7 +168,8 @@ document.body.appendChild(component());
 
 ```js
   "scripts": {
-    "dev": "webpack serve --mode=development --config script/webpack.config.js"
+    "dev": "webpack serve --mode=development --config script/webpack.config.js",
+    "build": "webpack --mode=production --config script/webpack.config.js"
   },
 ```
 
@@ -189,22 +190,259 @@ npm run dev
 
 另外，运行`npm run build`构建项目。
 
+**从前端模块化开始讲起吧**
+
+一开始前端只需要写`script`标签，自从AJAX技术出现，就有了前后端分离，前端代码开始变得复杂。为了应对代码量的与日俱增，模块化应运而生。
+
+模块化的发展相见我的另一篇[博客](https://cescdf.com/blog/202105/javascript-node-v8-basic#JavaScript%E6%A8%A1%E5%9D%97%E5%8C%96%E8%BF%9B%E5%8C%96%E8%BF%87%E7%A8%8B)。
+
+> 总而言之，模块化是为了正确处理分块开发时的命名冲突问题。
+
+这里重点讲一下CommonJS和ES6怎么实现的模块化，
+
+**CommonJS**
+
+CommonJS的关键字有`module`, `exports`, `require`。
+
+原理暂略。
+
+**ES6**
+
+ES6直接定义了`import`和`export`这两个关键字，另外，大多数浏览器已经通过`type`直接支持了ES6模块，
+
+```html
+<script src="abc.js" type="module"></script>
+```
+
+`export default`只能用一次，它允许导入的时候用户自定义变量或函数的名字。
+
+`import * as m from "module"`允许通过`m.data`取出模块的内容，也避免了命名污染。
+
+原理也先暂略，之后要有时间再补上。
+
+**bundle**
+
+Webpack打包的命令如下，
+
+```shell
+webpack ./src/main.js ./dist/bundle.js
+```
+
+这样webpack会自动处理`main.js`文件里的依赖，然后最终打包到`bundle.js`中。
+
+如果想把webpack的打包命令直接绑定到`npm run build`上，则需要在package.json文件中这样写，
+
+```json
+"scirpt": {
+  "build": webpack,
+}
+```
+
+这样命令行运行`npm run build`之后，webpack就会去找`webpack.config.js`文件，通过文件里入口和出口的声明（以及其他配置），就能输出打包文件。
+
+**loader**
+
+加载html文件，css以及各种变体（纯css也可以通过`require`引入，加上合适的loader就能实现，所以打包样式也是webpack的功能），还有从`.vue`，`.jsx`文件转译成普通js文件，都需要loader来完成，不添加loader的webpack是不具备这些功能的。
+
+下面我们来配置一个css-loader，在`webpack.config.js`中，
+
+```json
+module.exports = {
+  entry: '...',
+  output: {
+    ...,
+  },
+  module: {
+    rules: [
+      {
+        test: "/\.css$/",
+        use: ['style-loader', 'css-loader'],
+      }
+    ]
+  }
+}
+```
+
+其实就是在`module-rules`这个列表里配置一个对象，这个对象有两个属性，
+
+- `test`：对应文件的正则表达式；
+- `use`：对应文件用到的loader，是一个列表；
+
+简单讲一下这两个loader，`css-loader`负责加载css文件，`style-loader`负责把样式挂载到DOM中，webpack这个版本**（3）**是从右向左读，所以顺序也不能乱（我觉得新版本**（5）**应该解决了这种小问题吧）。
+
+**less**
+
+这里不讲less，只讲一下webpack的<u>缝合</u>功能。其实像Babel，less这些东西都有自己的npm包和命令行功能的，
+
+webpack只是一个打包工具，它可以把这些东西都配置成一个所谓“<u>环境</u>”，这样你就不用去单独整这些工具，而是直接使用封装在webpack里的对应的loader，所以：
+
+**webpack-loader只是整合了现有工具，掌握webpack的根本在于理解并使用这些工具，webpack只是一个工具封装集合。**
+
+**图片**
+
+在纯css里通过url引用图片路径，也需要一个`url-loader`，代码示例如下，
+
+> url-loader: A loader for webpack which transforms files into **base64** URIs.
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpg|gif|jpeg)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192, // 单位
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
+> `url-loader`也可以[加载svg](https://v4.webpack.js.org/loaders/url-loader/#svg)。
+
+注意，url的加载涉及开发时和发布时的路径问题，这个问题可以通过`output-publicPath`配置解决。
+
+**babel**
+
+Babel也可以在webpack里通过loader配置，即`babel-loader`。
+
+官方推荐的配置是，
+
+```js
+module: {
+  rules: [
+    {
+      test: /\.m?js$/,
+      exclude: /(node_modules|bower_components)/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env']
+        }
+      }
+    }
+  ]
+}
+```
+
+注意`exclude`属性的使用。
+
+**plugins**
+
+loader我们可以看作转换器，而plugins是一个扩展器，对webpack的功能进行扩展。
+
+下面我们来随机介绍一个插件，比如给自己的代码加上版权、作者和协议声明。
+
+- `webpack.BannerPlugin()`
+
+这是webpack自带的插件，直接`webpack = require('webpack')`就可以使用。
+
+```js
+const webpack = require('webpack');
+
+module.exports = {
+  // ...
+  plugins: [
+    new webpack.BannerPlugin('hhh'),
+  ]
+}
+```
+
+> 所有的webpack自带插件链接：点[这里](https://webpack.js.org/plugins/)。
+
+- `HtmlWebpackPlugin()`
+
+**基本用法：**该插件将为您生成一个HTML5文件，其中包含使用`<script>`标记在正文中的所有webpack包。将插件添加到您的网页包配置中，如下所示：
+
+```javascript
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
+
+module.exports = {
+  entry: 'index.js',
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: 'index_bundle.js',
+  },
+  plugins: [new HtmlWebpackPlugin()],
+};
+```
+
+这将会自动生成 `dist/index.html` 文件，并包含如下内容，
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>webpack App</title>
+  </head>
+  <body>
+    <script src="index_bundle.js"></script>
+  </body>
+</html>
+```
+
+你也可以在初始化插件时加入`template`属性，以创建不同模板的html。
+
+>If you have multiple webpack entry points, they will all be included with `<script>` tags in the generated HTML.
+>
+>If you have any CSS assets in webpack's output (for example, CSS extracted with the [MiniCssExtractPlugin](https://webpack.js.org/plugins/mini-css-extract-plugin/)) then these will be included with `<link>` tags in the `<head>` element of generated HTML.
+
+- `webpack-dev-server`
+
+webpack官方的例子是，
+
+```js
+var path = require('path');
+
+module.exports = {
+  //...
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    port: 9000,
+  },
+};
+```
+
+注意，要通过`npm run dev`启动，还需要配置`package.json`，
+
+```json
+"script": {
+  "dev": "webpack-dev-server --open"
+}
+```
+
+这个插件最好用的是**热更新**，配置如下，
+
+```js
+module.exports = {
+  //...
+  devServer: {
+    hot: true,
+  },
+};
+
+```
+
+> 点击[这里](https://webpack.js.org/concepts/hot-module-replacement/)查看官方写的热更新原理。
+
+**mode**
+
+webpack还可以分离开发时和生产环境的配置，通过同时调整webpack.config.js的文件名，以及属性`mode`和package.json里的`scripts`标签来分离环境，这里略。
+
 ### Babel
 
 > 这里的原理部分摘抄自字节前端的[推送](https://mp.weixin.qq.com/s/rioaemy9iRBxPnqFu-zOGQ)。
 
 Babel 是一个 JavaScript 编译器。作为`JS`编译器，`Babel`接收输入的`JS`代码，经过内部处理流程，最终输出修改后的`JS`代码。
-
-在`Babel`内部，会执行如下步骤：
-
-1. 将`Input Code`解析为`AST`（抽象语法树）,这一步称为`parsing`；
-2. 编辑`AST`，这一步称为`transforming`；
-3. 将编辑后的`AST`输出为`Output Code`，这一步称为`printing`；
-
-从[Babel仓库](https://github.com/babel/babel/tree/main/packages)的源代码，可以发现：`Babel`是一个由几十个项目组成的`Monorepo`。其中`babel-core`提供了以上提到的三个步骤的能力。在`babel-core`内部，更细致的讲：
-
-- `babel-parser`实现第一步
-- `babel-generator`实现第三步
 
 对于Babel的使用，我们需要安装如下包，
 
@@ -251,7 +489,13 @@ npm install -D @babel/preset-react
 
 使用Babel的一个好处是，可以通过将新语法转移成比较早期的JS语法，来理解这些新语法是怎么实现的，比如转译ES6的新特性，或者JSX语法。
 
-例如，通过如下语句转移一个jsx文件：
+如果只是想做polyfill，取消ES6及之后的特性，
+
+```bash
+npx babel file.jsx --presets=@babel/preset-env -o compiled.js
+```
+
+另外，如果是转移一个jsx文件，则需要添加react配置：
 
 ```shell
 npx babel file.jsx --presets=@babel/preset-env, @babel/preset-react -o compiled.js
@@ -264,6 +508,17 @@ Babel官方提供[在线编译器](https://babeljs.io/repl/)进行在线转换�
 注意，当前Babel的版本是Babel7，它与Babel6的presets以及plugins都是不兼容的，通过包的版本号开头的数字可以判断包属于6还是7。
 
 > 参考[阮一峰老师的博客](http://www.ruanyifeng.com/blog/2016/01/babel.html)。
+
+在`Babel`内部，会执行如下步骤：
+
+1. 将`Input Code`解析为`AST`（抽象语法树）,这一步称为`parsing`；
+2. 编辑`AST`，这一步称为`transforming`；
+3. 将编辑后的`AST`输出为`Output Code`，这一步称为`printing`；
+
+从[Babel仓库](https://github.com/babel/babel/tree/main/packages)的源代码，可以发现：`Babel`是一个由几十个项目组成的`Monorepo`。其中`babel-core`提供了以上提到的三个步骤的能力。在`babel-core`内部，更细致的讲：
+
+- `babel-parser`实现第一步
+- `babel-generator`实现第三步
 
 ### TypeScript
 
@@ -349,3 +604,4 @@ let tom: Person = {
 ```
 
 此外，还有数组类型，函数类型，内置对象（`Boolean`、`Error`、`Date`、`RegExp`，或`HTMLElement`、`Event`、`NodeList`）、等等类型约束，这里不展开讲了。
+
