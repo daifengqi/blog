@@ -178,7 +178,97 @@ Trie.prototype.startsWith = function(prefix) {
 - 指向子节点的指针数组`children`，对于本题而言，数组长度为26，即小写英文字母的数量。`children[0]`指向`a`，`children[25]`指向`z`；
 - 布尔字段`isEnd`，表示该节点是否为字符串的结尾；
 
+### 状态机
 
+严格来说，状态机可能不算一种特定的数据结构，但在这里还是介绍一下。
+
+状态及通常用于验证某个给定字符串是否满足某种要求，一般是遍历一次字符串，途中遇到不符合要求的地方就返回false，否则返回true。状态机的转移过程如下，
+
+```js
+let state = State.STATE_INITIAL; // 设置初始状态
+
+// s：需要检查的字符串
+for (const c of s) {
+  const type = toCharType(c);
+  // transfer：字典的字典，外部是State -> Map的映射
+  // 内部嵌套的Map是 charType -> State
+  if (!transfer.get(state).has(type)) {
+    return false;
+  } else {
+    // 完成 state -> state 的转变
+    state = transfer.get(state).get(type);
+  }
+}
+```
+
+解决一个状态机问题需要定义好，
+
+- 所有状态（转移前、转移后）
+- 转移模式（处于状态i时遇到c怎么转移）
+
+通常可用一张图来表述，[有效数字](https://leetcode-cn.com/problems/valid-number/)的例子如下，
+
+![fig1](https://assets.leetcode-cn.com/solution-static/65/1.png)
+
+只要能清晰画出和理解状态机的这张图，就能解决相应的问题。
+
+上图共有9个状态，如下，
+
+```js
+const State = {
+  STATE_INITIAL : "STATE_INITIAL",
+  STATE_INT_SIGN : "STATE_INT_SIGN",
+  STATE_INTEGER : "STATE_INTEGER",
+  STATE_POINT : "STATE_POINT",
+  STATE_POINT_WITHOUT_INT : "STATE_POINT_WITHOUT_INT",
+  STATE_FRACTION : "STATE_FRACTION",
+  STATE_EXP : "STATE_EXP",
+  STATE_EXP_SIGN : "STATE_EXP_SIGN",
+  STATE_EXP_NUMBER : "STATE_EXP_NUMBER",
+  STATE_END : "STATE_END"
+}
+```
+
+字符串中的所有元素类型如下，
+
+```js
+const CharType = {
+  CHAR_NUMBER : "CHAR_NUMBER",
+  CHAR_EXP : "CHAR_EXP",
+  CHAR_POINT : "CHAR_POINT",
+  CHAR_SIGN : "CHAR_SIGN",
+  CHAR_ILLEGAL : "CHAR_ILLEGAL"
+}
+
+const toCharType = (ch) => {
+  if (!isNaN(ch)) {
+    return CharType.CHAR_NUMBER;
+  } else if (ch.toLowerCase() === 'e') {
+    return CharType.CHAR_EXP;
+  } else if (ch === '.') {
+    return CharType.CHAR_POINT;
+  } else if (ch === '+' || ch === '-') {
+    return CharType.CHAR_SIGN;
+  } else {
+    return CharType.CHAR_ILLEGAL;
+  }
+}  
+```
+
+通过状态转移关系给出嵌套字典表示的路径，
+
+```js
+const transfer = new Map();
+const initialMap = new Map();
+// 初始状态有三种转出方式，所以内部字典有三个映射
+initialMap.set(CharType.CHAR_NUMBER, State.STATE_INTEGER);
+initialMap.set(CharType.CHAR_POINT, State.STATE_POINT_WITHOUT_INT);
+initialMap.set(CharType.CHAR_SIGN, State.STATE_INT_SIGN);
+// 设置外部字典，从状态到映射关系
+transfer.set(State.STATE_INITIAL, initialMap);
+```
+
+上面只是一种状态，其他转移关系（图中的线）也需要分别定义。
 
 ### 特殊结构
 
