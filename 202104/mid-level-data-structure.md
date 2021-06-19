@@ -270,6 +270,12 @@ transfer.set(State.STATE_INITIAL, initialMap);
 
 上面只是一种状态，其他转移关系（图中的线）也需要分别定义。
 
+### 双栈问题
+
+一般经典的表达式处理问题，我们使用操作符栈（ops）+操作数栈（state）的经典双栈方式来进行模拟。
+
+题目：[反转表达式值的最少操作次数](https://leetcode-cn.com/problems/minimum-cost-to-change-the-final-value-of-expression/)、题解
+
 ### 特殊结构
 
 其他数据结构，比如[最小栈](https://leetcode-cn.com/problems/min-stack/)，也属于一种“中级”的数据结构，它们通常基于某种基础结构，然后加入了某些特定的方法，包装成一个新类。新方法往往有时间复杂度的限制。
