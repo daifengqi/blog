@@ -289,3 +289,5 @@ transfer.set(State.STATE_INITIAL, initialMap);
 
 一道哈希表的例题：[【最长连续序列】](https://leetcode-cn.com/problems/longest-consecutive-sequence/)，这道题如果不知道要使用hash表来做，往往容易被误导，若是知道了就相对简单。
 
+一道哈希表的题：[【直线上最多的点数】](https://leetcode-cn.com/problems/max-points-on-a-line/)，很体现哈希表优化一次遍历的时间复杂度的思想。
+
