@@ -50,7 +50,7 @@ Npm (originally short for Node Package Manager) is a package manager for the Jav
 
 Other small packages are also useful, such as "bcryptjs" that provides hash function, "jsonwebtoken" that lets us give token to users, and "axios" for based HTTP client for the browser and Node.js.
 
-### 4.4 UI: The Part of View
+### UI: The Part of View
 
 We will use a frontend framework called React that is developed by a Facebook team. One of the reason we choose React is that the cross-end development is well supported under the efforts of Facebook Team and some domestic lab. We can really write once, and let the code run anywhere including Web, desktop and mobile apps, and even Wechat mini-program.
 
