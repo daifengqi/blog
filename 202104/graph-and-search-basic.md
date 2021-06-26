@@ -82,6 +82,32 @@ var cloneGraph = function(node) {
 
 最短路涉及到BFS的层序遍历，即每次取`size=queue.length`，然后对`size`的规模遍历，这样做的好处是，控制遍历时的节点一定是上一轮遍历加入时的节点，在每轮遍历之间可以进行某些处理。
 
+### DFS和BFS：对比
+
+当一个问题需要搜索时，多半DFS和BFS都可以，那这时候因为DFS更好些，所以大多数情况下都写DFS。
+
+**只有一种情况必须用BFS，那就是找<u>最短</u>的路径。**下面是BFS找最短路的一些注意点，
+
+- 加入已经访问过的点到一个集合（`vis`），如果已经访问过就跳过；
+- `while(que.length > 0)`开始搜索，作为最外层循环；
+- 外层循环与内层循环之间记录步数（`++step`）；
+- 内层循环之前一定要先取出`size = que.length`，确保内层循环是遍历上次放入的这些；
+
+```javascript
+// 内层循环
+for (let i=0; i<size; ++i) {
+  const state = que.shift();
+  // ...计算新的状态，如果不在vis里就加入que
+}
+```
+
+注意，有时候不只用一个整数追踪步数（或距离）`step`，也可以用一个哈希表映射状态到步数`map.set(state, step)`。
+
+好的例题，
+
+- [打开转盘锁](https://leetcode-cn.com/problems/open-the-lock/)，[三叶的题解](https://leetcode-cn.com/problems/open-the-lock/)，[我的JavaScript译版](https://leetcode-cn.com/problems/open-the-lock/solution/javascript-zhuan-yi-zi-san-xie-jie-de-sh-b94u/)；
+- [单词接龙](https://leetcode-cn.com/problems/word-ladder/)
+
 ### 拓扑排序
 
 宽度优先搜索（队列）的另一个应用是拓扑排序`（topSort）`，用在有依赖关系的「有向图」中。这个图必须是「无环」的，否则会造成类似死锁的情况。拓扑排序的思想是不断地找到入度为0度点，加入队列，然后更新其他点的入度，不断循环。<u>拓扑排序的本质还是搜索，不论是深搜还是宽搜</u>。
