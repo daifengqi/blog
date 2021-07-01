@@ -192,7 +192,7 @@ Keep-Alive: timeout=5, max=100
 - GET参数通过URL传递，POST放在Request body中。
 - GET请求参数会被完整保留在浏览器历史记录里，而POST中的参数不会被保留。
 - GET 请求中有非 ASCII 字符，会在请求之前进行转码，POST不用，因为POST在Request body中，通过 MIME，也就可以传输非 ASCII 字符。
-- PUT请求会修改并储存资源，而且是幂等的，即说如果几个POST请求相同，最后的请求会覆盖前面的请求，而POST请求不是幂等的，仅用于数据传输。
+- PUT请求会修改并储存资源，而且是幂等的，即说如果几个PUT请求相同，最后的请求会覆盖前面的请求，而POST请求不是幂等的，仅用于数据传输。
 
 ### HTTP2
 
