@@ -161,7 +161,7 @@ export const CounterComponent = ({ value }) => {
 const result: any = useSelector(selector: Function, equalityFn?: Function)
 ```
 
-useSelector是从store提取状态数据的Hook。顾名思义`selector`用于从state中选择某些数据出来，例如，
+useSelector是从store提取状态数据的Hook。顾名思义`selector`用于从state中选择对应的reducer（的对象）出来，例如，
 
 ```jsx
 import React from 'react'
@@ -173,7 +173,7 @@ export const CounterComponent = () => {
 }
 ```
 
-这里直接选择了`state`的`counter`属性，同样，你还可以利用某些变量，比如props，
+这里直接选择了`state`的`counter` Reducer，同样，你还可以利用某些变量，比如props，
 
 ```jsx
 export const TodoListItem = (props) => {
@@ -182,7 +182,7 @@ export const TodoListItem = (props) => {
 }
 ```
 
-这里选择的是`state.todos[props.id]`。**注意，`selector`传入的必然是全局状态，提取的是状态的某个部分。**
+这里选择的是`state.todos[props.id]`。**注意，`selector`传入的是 combine 后的状态，提取的是对应Reducer的对象。**
 
 - useStore()
 

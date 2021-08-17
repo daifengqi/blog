@@ -71,7 +71,7 @@ constructor(data, compare) {
   this.compare = compare;
   
   // data.length >> 1的作用是，从非叶子节点开始处理，叶子节点不用管，因为已经在最底层
-  // 反向处理
+  // 反向处理，确保最后根部的节点是最“强”的
   for (let i = (data.length >> 1) - 1; i>=0; --i) {
     this.heapify(i);
   }
